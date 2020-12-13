@@ -1,4 +1,5 @@
-from game_setup import make_specs
+from game_setup import *
+from collections import Counter
 import random
 import numpy as np
 
@@ -7,18 +8,19 @@ class Board:
 
     def __init__(self, gameModes):
 
-        mySpecs = make_specs(gameModes)
+        #mySpecs = make_specs(gameModes)
+        mySpecs = gameModes
         
-        self.pins = mySpecs['pins']
-        self.colours = mySpecs['colours']
-        self.guesses = mySpecs['guesses']
-        self.truth = mySpecs['truth']
+        self.pins = make_pins_number(mySpecs['pins'])
+        self.colours = make_colour_number(mySpecs['colours'])
+        self.guesses = make_guess_number(mySpecs['guesses'])
+        self.truth_mode = mySpecs['truth']
         self.player = mySpecs['player']
-        self.currentGuess = 1
+        self.currentGuess = 0
 
         self.board = np.zeros([self.guesses, self.pins])
         self.scores = np.zeros([self.guesses])
-        self.truth = self.get_truth()
+        self.truth = self.make_truth()
 
     def get_pins(self) -> int:
         return self.pins
@@ -37,10 +39,10 @@ class Board:
 
     def make_truth(self) -> np.array:
 
-        if self.truth == 'random':
-            
-            pins = self.pins
-            colours = self.colours
+        pins = self.pins
+        colours = self.colours
+
+        if self.truth_mode == 'random':
 
             trueColours = np.empty([pins], dtype=int)
 
@@ -48,11 +50,11 @@ class Board:
                 colour = random.randint(1, colours)
                 trueColours[pin-1] = colour
 
-        elif self.truth == 'pregen':
+        elif self.truth_mode == 'pregen':
 
             trueColours = np.ones([pins])
 
-        elif self.truth == 'input':
+        elif self.truth_mode == 'input':
 
             trueColours = np.empty([pins], dtype=int)
 
@@ -78,25 +80,62 @@ class Board:
 
     def calc_score(self, turn):
 
+        colours = self.get_colours()
         truth = self.truth
-        toScore = self.board[turn]
+        toScore = self.board[0-turn]
 
-        #get the 
-        score = (0,0)
+        greens = 0
+        amberTrues = []
+        amberGuess = []
+        for pin_num in range(len(truth)):
+
+            T = truth[pin_num] # Colour of pin for true 
+            G = toScore[pin_num] # Colour of pin from guess
+
+            if T == G:
+                greens += 1
+
+            else:
+                amberTrues.append(T)
+                amberGuess.append(G)
+
+        ambers = 0
+        true_counter = Counter(amberTrues)
+        guess_counter = Counter(amberGuess)
+
+        for colour in range(colours):
+            ambers += min(true_counter[colour], guess_counter[colour])
+        
+        score = (greens, ambers)
 
         return score
 
     def take_turn(self):
 
-        #get current turn number
+        self.currentGuess += 1
         turn = self.currentGuess
-        #get guess
-        for place in range(self.pins):
-            #go through pins, and get colour for each
-            thisPin = self.make_guess()
-            self.board[turn, place] = thisPin
 
-        #return score for guess
+        for place in range(self.pins):
+
+            thisPin = self.make_guess()
+            self.board[0-turn, place] = thisPin
+
         score = self.calc_score(turn)
-            #if 100% win!
+        print("You got", score[0], "correct, and", score[1], "close.")
+        
+        if score == (self.pins, 0):
+            print("You won!!!!!!!!!")
+            state = 'win'
+
         #if last guess, lose :(
+        elif turn == self.guesses:
+            print("you ran out of guesses :(")
+            state = 'loss'
+
+        else:
+            print("Keep going!")
+            state = 'draw'
+
+
+
+        return state
