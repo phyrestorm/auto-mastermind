@@ -41,9 +41,9 @@ def play_mastermind(modes):
 if __name__ == "__main__":
 
     gameModes = {'colours':'',
-             'pins':'',
-             'guesses':'',
-             'player':'me',
-             'truth':'pregen'}
+                 'pins':'',
+                 'guesses':'',
+                 'player':'me',
+                 'truth':'pregen'}
 
     play_mastermind(gameModes)
