@@ -28,7 +28,8 @@ def play_mastermind(modes):
     state = 'draw'
 
     while state == 'draw':
-        print(myBoard.get_board())
+        myBoard.draw_board()
+        #print(myBoard.get_board())
         state = myBoard.take_turn()
 
     if state == 'win':
@@ -44,6 +45,7 @@ if __name__ == "__main__":
                  'pins':'',
                  'guesses':'',
                  'player':'me',
-                 'truth':'pregen'}
+                 'truth':'pregen',
+                 'drawing':'matrix'}
 
     play_mastermind(gameModes)

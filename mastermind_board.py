@@ -17,9 +17,10 @@ class Board:
         self.guesses = make_guess_number(mySpecs['guesses'])
         self.truth_mode = mySpecs['truth']
         self.player = mySpecs['player']
+        self.drawing_method = mySpecs['drawing']
         self.currentGuess = 0
 
-        self.board = np.zeros([self.guesses, self.pins])
+        self.board = np.zeros([self.guesses, self.pins], dtype=int)
         self.scores = np.zeros([self.guesses])
         self.truth = self.make_truth()
 
@@ -36,6 +37,19 @@ class Board:
         return self.truth
 
     def get_board(self):
+        return self.board
+
+    def draw_board(self):
+
+        if self.drawing_method == 'matrix':
+            print(self.board)
+        
+        elif self.drawing_method == 'ascii':
+            pass
+            
+        elif self.drawing_method == 'nltk':
+            pass
+
         return self.board
 
     def make_truth(self) -> np.array:
@@ -60,7 +74,7 @@ class Board:
             trueColours = np.empty([pins], dtype=int)
 
             for pin in range(pins):
-                trueColours[pin-1] = input("What is the truth for pin{}?".format(pin))
+                trueColours[pin-1] = int(input("What is the truth for pin{}?".format(pin)))
 
         return trueColours
 
