@@ -1,5 +1,6 @@
 from game_setup import *
 from collections import Counter
+from helper_functions import get_nth_place
 import random
 import numpy as np
 
@@ -63,10 +64,10 @@ class Board:
 
         return trueColours
 
-    def make_guess(self) -> int:
-
+    def make_guess(self, place) -> int:
+        
         if self.player == 'me':
-            guess = input("Please guess the val")
+            guess = input("Please guess the {} val".format(get_nth_place(place)))
         elif self.player == 'random':
             guess = random.randint(1, self.colours)
         elif self.player == 'ai':
@@ -117,7 +118,7 @@ class Board:
 
         for place in range(self.pins):
 
-            thisPin = self.make_guess()
+            thisPin = self.make_guess(place+1)
             self.board[0-turn, place] = thisPin
 
         score = self.calc_score(turn)
